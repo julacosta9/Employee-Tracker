@@ -24,55 +24,29 @@ manager_id INT
 );
 
 /* !!!CHANGE COLUMN NAMES IF DIFFERENT!!! */
-INSERT INTO department (department_name)
-VALUES ("Instructors");
-INSERT INTO department (department_name)
-VALUES ("TA's");
-INSERT INTO department (department_name)
-VALUES ("Students");
+INSERT INTO department (department_name) VALUES
+("Instructors"), ("TA's"), ("Students");
 
-INSERT INTO roles (id, title, salary, department_id)
-VALUES ("Instructor", 100000.00, 1);
-INSERT INTO roles (id, title, salary, department_id)
-VALUES ("TA", 90000.00, 2);
-INSERT INTO roles (id, title, salary, department_id)
-VALUES ("Student", 0.00, 3);
+INSERT INTO roles (title, salary, department_id) VALUES
+("Instructor", 100000.00, 1), ("TA", 90000.00, 2), ("Student", 0.00, 3);
 
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Harrison", "Schaen", 1, NULL);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Steph", "Huynh", 2, 911);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Steven", "Landgraf", 2, 911);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Daniel", "Angulo", 3, 811);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Said", "Aguilar", 3, 811);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Matthew", "Bell", 3, 811);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Julian", "Acosta", 3, 811);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Tyler", "Arthur", 3, 811);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Javier", "Banuelos", 3, 811);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Art", "Aragon", 3, 811);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Cara", "Bunnell", 3, 811);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Jaycee", "Bagtas", 3, 812);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Alexia", "Chalita", 3, 812);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Lizbeth", "Glasser", 3, 812);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Collin", "Kier", 3, 812);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Brian", "Monteverde", 3, 812);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Greg", "Schuman", 3, 812);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Amy", "Fabella", 3, 812);
-INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES ("Jason", "Riley", 3, 812);
+INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES
+("Harrison", "Schaen", 1, NULL),
+("Steph", "Huynh", 2, 1),
+("Steven", "Landgraf", 2, 1),
+("Daniel", "Angulo", 3, 2),
+("Said", "Aguilar", 3, 2),
+("Matthew", "Bell", 3, 2),
+("Julian", "Acosta", 3, 2),
+("Tyler", "Arthur", 3, 2),
+("Javier", "Banuelos", 3, 2),
+("Art", "Aragon", 3, 2),
+("Cara", "Bunnell", 3, 2),
+("Jaycee", "Bagtas", 3, 3),
+("Alexia", "Chalita", 3, 3),
+("Lizbeth", "Glasser", 3, 3),
+("Collin", "Kier", 3, 3),
+("Brian", "Monteverde", 3, 3),
+("Greg", "Schuman", 3, 3),
+("Amy", "Fabella", 3, 3),
+("Jason", "Riley", 3, 3);
