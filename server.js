@@ -26,6 +26,8 @@ connection.connect(function (err) {
     console.log("connected as id " + connection.threadId);
 });
 
+//README TODOS - Validate the user's entry of IDs such that the IDs must exist
+
 initTracker();
 
 function initTracker() {
@@ -45,7 +47,7 @@ function initTracker() {
                     value: "addRole",
                 },
                 {
-                    name: "ADD a employee",
+                    name: "ADD an employee",
                     value: "addEmployee",
                 },
                 {
@@ -57,8 +59,16 @@ function initTracker() {
                     value: "update",
                 },
                 {
-                    name: "DELETE a department, role, or employee",
-                    value: "delete",
+                    name: "DELETE a department",
+                    value: "deleteDepartment",
+                },
+                {
+                    name: "DELETE a role",
+                    value: "deleteRole",
+                },
+                {
+                    name: "DELETE an employee",
+                    value: "deleteEmployee",
                 },
                 new inquirer.Separator(),
                 {
@@ -85,13 +95,25 @@ function initTracker() {
                 case "addRole":
                     addRole();
                     break;
-                
+
                 case "addEmployee":
                     addEmployee();
                     break;
 
                 case "update":
                     updateRole();
+                    break;
+
+                case "deleteDepartment":
+                    deleteDepartment();
+                    break;
+
+                case "deleteRole":
+                    deleteRole();
+                    break;
+
+                case "deleteEmployee":
+                    deleteEmployee();
                     break;
 
                 case "Search for a specific song":
@@ -105,21 +127,129 @@ function initTracker() {
         });
 }
 
-function deleteProduct() {
-    console.log("Deleting all strawberry icecream...\n");
-    connection.query(
-      "DELETE FROM products WHERE ?",
-      {
-        flavor: "strawberry"
-      },
-      function(err, res) {
-        if (err) throw err;
-        console.log(res.affectedRows + " products deleted!\n");
-        // Call readProducts AFTER the DELETE completes
-        readProducts();
-      }
-    );
-  }
+function deleteDepartment() {
+    
+    // display department table so user can easily view all IDs
+    displayAllDepartments();
+
+    inquirer
+        .prompt({
+            name: "departmentId",
+            type: "input",
+            message: "Enter the ID of the department you want to delete",
+        })
+        .then((answer) => {
+            console.log("Deleting department...\n");
+
+            // Delete department
+            connection.query(
+                "DELETE FROM department WHERE ?",
+                {
+                    id: answer.departmentId,
+                },
+                function (err, res) {
+                    if (err) throw err;
+                    console.log("Department deleted!\n");
+
+                    // initTracker();
+                }
+            );
+            
+            // Update the roles table so that roles that were assigned to this now deleted department are updated to have a department id of '0' which signifies that they are now unassigned to a department
+            connection.query(
+                "UPDATE roles SET ? WHERE ?",
+                [
+                    {
+                        department_id: "0",
+                    },
+                    {
+                        department_id: answer.departmentId,
+                    },
+                ],
+                function (err, res) {
+                    if (err) throw err;
+                    console.log("Roles that were assigned to this department have been updated to '0' which signifies that they are now unassigned to a department.\n");
+                }
+            );
+
+            initTracker();
+        });
+}
+
+function deleteRole() {
+    
+    // display department table so user can easily view all IDs
+    displayAllRoles();
+
+    inquirer
+        .prompt({
+            name: "roleId",
+            type: "input",
+            message: "Enter the ID of the role you want to delete",
+        })
+        .then((answer) => {
+            console.log("Deleting role...\n");
+
+            // Deletes role from table
+            connection.query(
+                "DELETE FROM roles WHERE ?",
+                {
+                    id: answer.roleId,
+                },
+                function (err, res) {
+                    if (err) throw err;
+                    console.log("Department deleted!\n");
+                }
+            );
+
+            // Update the employee table so that employees that were assigned to this now deleted role are updated to have a role id of '0' which signifies that they are now unassigned to a department
+            connection.query(
+                "UPDATE employee SET ? WHERE ?",
+                [
+                    {
+                        role_id: "0",
+                    },
+                    {
+                        role_id: answer.roleId,
+                    },
+                ],
+                function (err, res) {
+                    if (err) throw err;
+                    console.log("Employees that were assigned to this role have been updated to '0' which signifies that they are now unassigned to a role.\n");
+                }
+            );
+
+            initTracker();
+        });
+}
+
+function deleteEmployee() {
+    
+    // display department table so user can easily view all IDs
+    displayAllEmployees();
+
+    inquirer
+        .prompt({
+            name: "employeeId",
+            type: "input",
+            message: "Enter the ID of the employee you want to delete",
+        })
+        .then((answer) => {
+            console.log("Deleting employee...\n");
+            connection.query(
+                "DELETE FROM employee WHERE ?",
+                {
+                    id: answer.employeeId,
+                },
+                function (err, res) {
+                    if (err) throw err;
+                    console.log("Employee deleted!\n");
+                }
+            );
+
+            initTracker();
+        });
+}
 
 function updateRole() {
     let employeeId;
@@ -144,28 +274,28 @@ function updateRole() {
                     name: "roleId",
                     type: "input",
                     message: "Enter the role ID you want the user to have",
-            })
-            .then((answer) => {
-                console.log("Updating employee role...\n");
+                })
+                .then((answer) => {
+                    console.log("Updating employee role...\n");
 
-                connection.query(
-                    "UPDATE employee SET ? WHERE ?",
-                    [
-                      {
-                        role_id: answer.roleId
-                      },
-                      {
-                        id: employeeId
-                      }
-                    ],
-                    function (err, res) {
-                        if (err) throw err;
-                        console.log("Employee role updated!\n");
-                        // Call updateProduct AFTER the INSERT completes
-                        initTracker();
-                    }
-                );
-            });
+                    connection.query(
+                        "UPDATE employee SET ? WHERE ?",
+                        [
+                            {
+                                role_id: answer.roleId,
+                            },
+                            {
+                                id: employeeId,
+                            },
+                        ],
+                        function (err, res) {
+                            if (err) throw err;
+                            console.log("Employee role updated!\n");
+                            // Call updateProduct AFTER the INSERT completes
+                            initTracker();
+                        }
+                    );
+                });
         });
 }
 
@@ -195,25 +325,27 @@ function addDepartment() {
 
 function addRole() {
     inquirer
-        .prompt([{
-            name: "title",
-            type: "input",
-            message: "What is the role title?",
-        },
-        {
-            name: "salary",
-            type: "input",
-            message: "What is this roles salary?",
-            validate: function(value) {
-                let valid = !isNaN(value);
-                return valid || 'Please enter a number';
-            }
-        },
-        {
-            name: "department_id",
-            type: "input",
-            message: "What is this role's department ID?"
-        }])
+        .prompt([
+            {
+                name: "title",
+                type: "input",
+                message: "What is the role title?",
+            },
+            {
+                name: "salary",
+                type: "input",
+                message: "What is this roles salary?",
+                validate: function (value) {
+                    let valid = !isNaN(value);
+                    return valid || "Please enter a number";
+                },
+            },
+            {
+                name: "department_id",
+                type: "input",
+                message: "What is this role's department ID?",
+            },
+        ])
         .then((answer) => {
             console.log("Adding a new role...\n");
             connection.query(
@@ -235,26 +367,27 @@ function addRole() {
 
 function addEmployee() {
     inquirer
-        .prompt([{
-            name: "firstName",
-            type: "input",
-            message: "What is the employee's first name?"
-        },
-        {
-            name: "lastName",
-            type: "input",
-            message: "What is the employee's last name?"
-        },
-        {
-            name: "roleId",
-            type: "input",
-            message: "What is this employee's role ID?"
-        },
-        {
-            name: "managerId",
-            type: "input",
-            message: "What is this employee's manager ID?"
-        }
+        .prompt([
+            {
+                name: "firstName",
+                type: "input",
+                message: "What is the employee's first name?",
+            },
+            {
+                name: "lastName",
+                type: "input",
+                message: "What is the employee's last name?",
+            },
+            {
+                name: "roleId",
+                type: "input",
+                message: "What is this employee's role ID?",
+            },
+            {
+                name: "managerId",
+                type: "input",
+                message: "What is this employee's manager ID?",
+            },
         ])
         .then((answer) => {
             console.log("Adding a new employee...\n");
@@ -264,7 +397,7 @@ function addEmployee() {
                     first_name: answer.firstName,
                     last_name: answer.lastName,
                     role_id: answer.roleId,
-                    manager_id: answer.managerId
+                    manager_id: answer.managerId,
                 },
                 function (err, res) {
                     if (err) throw err;
@@ -407,10 +540,9 @@ function songSearch() {
 function displayAllEmployees() {
     let query = "SELECT * FROM employee ";
     connection.query(query, (err, res) => {
-        
         if (err) throw err;
 
-        console.log('\n\n ** Full Employee list ** \n');
+        console.log("\n\n ** Full Employee list ** \n");
         console.table(res);
     });
 }
@@ -418,10 +550,9 @@ function displayAllEmployees() {
 function displayAllRoles() {
     let query = "SELECT * FROM roles ";
     connection.query(query, (err, res) => {
-        
         if (err) throw err;
 
-        console.log('\n\n ** Full Role list ** \n');
+        console.log("\n\n ** Full Role list ** \n");
         console.table(res);
     });
 }
@@ -429,10 +560,9 @@ function displayAllRoles() {
 function displayAllDepartments() {
     let query = "SELECT * FROM department ";
     connection.query(query, (err, res) => {
-        
         if (err) throw err;
 
-        console.log('\n\n ** Full Department list ** \n');
+        console.log("\n\n ** Full Department list ** \n");
         console.table(res);
     });
 }
