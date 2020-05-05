@@ -33,30 +33,43 @@ function initTracker() {
         .prompt({
             name: "action",
             type: "list",
-            message: "Welcome to the employee tracker management system. What would you like to do?",
+            message:
+                "Welcome to the employee tracker management system. What would you like to do?",
             choices: [
                 {
-                    name: "ADD a department, role, or employee",
-                    value: "add"
+                    name: "ADD a department",
+                    value: "addDepartment",
+                },
+                {
+                    name: "ADD a role",
+                    value: "addRole",
+                },
+                {
+                    name: "ADD a employee",
+                    value: "addEmployee",
                 },
                 {
                     name: "VIEW all departments, roles, or employees",
-                    value: "view"
+                    value: "view",
                 },
                 {
                     name: "UPDATE employee roles",
-                    value: "update"
+                    value: "update",
                 },
                 {
                     name: "DELETE a department, role, or employee",
-                    value: "delete"
+                    value: "delete",
                 },
                 new inquirer.Separator(),
                 {
                     name: "VIEW total utilized budget of a department",
-                    value: "viewSalaries"
+                    value: "viewSalaries",
                 },
-            ]
+                {
+                    name: "Exit Employee Tracker",
+                    value: "exit",
+                },
+            ],
         })
         .then(function (answer) {
             console.log(answer);
@@ -65,12 +78,20 @@ function initTracker() {
                     viewAll();
                     break;
 
-                case "Find all artists who appear more than once":
-                    multiSearch();
+                case "addDepartment":
+                    addDepartment();
                     break;
 
-                case "Find data within a specific range":
-                    rangeSearch();
+                case "addRole":
+                    addRole();
+                    break;
+                
+                case "addEmployee":
+                    addEmployee();
+                    break;
+
+                case "update":
+                    updateRole();
                     break;
 
                 case "Search for a specific song":
@@ -84,38 +105,209 @@ function initTracker() {
         });
 }
 
+function deleteProduct() {
+    console.log("Deleting all strawberry icecream...\n");
+    connection.query(
+      "DELETE FROM products WHERE ?",
+      {
+        flavor: "strawberry"
+      },
+      function(err, res) {
+        if (err) throw err;
+        console.log(res.affectedRows + " products deleted!\n");
+        // Call readProducts AFTER the DELETE completes
+        readProducts();
+      }
+    );
+  }
+
+function updateRole() {
+    let employeeId;
+
+    // display employee table so user can easily view all IDs
+    displayAllEmployees();
+
+    inquirer
+        .prompt({
+            name: "employeeId",
+            type: "input",
+            message: "Enter the ID of the employee you want to update",
+        })
+        .then((answer) => {
+            employeeId = answer.employeeId;
+
+            // display roles table so user can easily decide select a role ID
+            displayAllRoles();
+
+            inquirer
+                .prompt({
+                    name: "roleId",
+                    type: "input",
+                    message: "Enter the role ID you want the user to have",
+            })
+            .then((answer) => {
+                console.log("Updating employee role...\n");
+
+                connection.query(
+                    "UPDATE employee SET ? WHERE ?",
+                    [
+                      {
+                        role_id: answer.roleId
+                      },
+                      {
+                        id: employeeId
+                      }
+                    ],
+                    function (err, res) {
+                        if (err) throw err;
+                        console.log("Employee role updated!\n");
+                        // Call updateProduct AFTER the INSERT completes
+                        initTracker();
+                    }
+                );
+            });
+        });
+}
+
+function addDepartment() {
+    inquirer
+        .prompt({
+            name: "department_name",
+            type: "input",
+            message: "What is the department name?",
+        })
+        .then((answer) => {
+            console.log("Adding a new department...\n");
+            connection.query(
+                `INSERT INTO department SET ?`,
+                {
+                    department_name: answer.department_name,
+                },
+                function (err, res) {
+                    if (err) throw err;
+                    console.log("New department added!\n");
+                    // Call updateProduct AFTER the INSERT completes
+                    initTracker();
+                }
+            );
+        });
+}
+
+function addRole() {
+    inquirer
+        .prompt([{
+            name: "title",
+            type: "input",
+            message: "What is the role title?",
+        },
+        {
+            name: "salary",
+            type: "input",
+            message: "What is this roles salary?",
+            validate: function(value) {
+                let valid = !isNaN(value);
+                return valid || 'Please enter a number';
+            }
+        },
+        {
+            name: "department_id",
+            type: "input",
+            message: "What is this role's department ID?"
+        }])
+        .then((answer) => {
+            console.log("Adding a new role...\n");
+            connection.query(
+                `INSERT INTO roles SET ?`,
+                {
+                    title: answer.title,
+                    salary: answer.salary,
+                    department_id: answer.department_id,
+                },
+                function (err, res) {
+                    if (err) throw err;
+                    console.log("New role added!\n");
+                    // Call updateProduct AFTER the INSERT completes
+                    initTracker();
+                }
+            );
+        });
+}
+
+function addEmployee() {
+    inquirer
+        .prompt([{
+            name: "firstName",
+            type: "input",
+            message: "What is the employee's first name?"
+        },
+        {
+            name: "lastName",
+            type: "input",
+            message: "What is the employee's last name?"
+        },
+        {
+            name: "roleId",
+            type: "input",
+            message: "What is this employee's role ID?"
+        },
+        {
+            name: "managerId",
+            type: "input",
+            message: "What is this employee's manager ID?"
+        }
+        ])
+        .then((answer) => {
+            console.log("Adding a new employee...\n");
+            connection.query(
+                `INSERT INTO employee SET ?`,
+                {
+                    first_name: answer.firstName,
+                    last_name: answer.lastName,
+                    role_id: answer.roleId,
+                    manager_id: answer.managerId
+                },
+                function (err, res) {
+                    if (err) throw err;
+                    console.log("New role added!\n");
+                    // Call updateProduct AFTER the INSERT completes
+                    initTracker();
+                }
+            );
+        });
+}
+
 function viewAll() {
     inquirer
         .prompt({
             name: "table",
             type: "list",
-            message: "Would you like to view all departments, roles, or employees?",
+            message:
+                "Would you like to view all departments, roles, or employees?",
             choices: [
                 {
-                    name: 'Departments',
-                    value: 'department'
+                    name: "Departments",
+                    value: "department",
                 },
                 {
-                    name: 'Roles',
-                    value: 'roles'
+                    name: "Roles",
+                    value: "roles",
                 },
                 {
-                    name: 'Employees',
-                    value: 'employee'
-                }
-            ]
+                    name: "Employees",
+                    value: "employee",
+                },
+            ],
         })
         .then(function (answer) {
             console.log(`Selecting all from ${answer.table}...`);
             var query = "SELECT * FROM " + answer.table;
             connection.query(query, (err, res) => {
                 if (err) throw err;
-                console.log(`\n\n ** Full ${answer.table} list ** \n`)
+                console.log(`\n\n ** Full ${answer.table} list ** \n`);
                 console.table(res);
-            })
+            });
 
             initTracker();
-
         });
 }
 
@@ -210,6 +402,39 @@ function songSearch() {
                 }
             );
         });
+}
+
+function displayAllEmployees() {
+    let query = "SELECT * FROM employee ";
+    connection.query(query, (err, res) => {
+        
+        if (err) throw err;
+
+        console.log('\n\n ** Full Employee list ** \n');
+        console.table(res);
+    });
+}
+
+function displayAllRoles() {
+    let query = "SELECT * FROM roles ";
+    connection.query(query, (err, res) => {
+        
+        if (err) throw err;
+
+        console.log('\n\n ** Full Role list ** \n');
+        console.table(res);
+    });
+}
+
+function displayAllDepartments() {
+    let query = "SELECT * FROM department ";
+    connection.query(query, (err, res) => {
+        
+        if (err) throw err;
+
+        console.log('\n\n ** Full Department list ** \n');
+        console.table(res);
+    });
 }
 
 // Start our server so that it can begin listening to client requests.
