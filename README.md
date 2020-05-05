@@ -2,7 +2,7 @@
 
 This application is an easy to use CMS for non-developers to view and interact with information stored in a database. This is a solution for managing a company's employees built with Node.js, MySQL, and Inquirer
 
-![Demo](/assets/employee-tracker-demo.mp4)
+![Demo Video](https://i.imgur.com/2rTf2S0.mp4)
 
 ## Installation
 
