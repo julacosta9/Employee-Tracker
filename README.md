@@ -11,7 +11,3 @@ Seed your MySQL database using the seeds.sql file. Then run the following:
 npm install
 node server.js
 ```
-
-## Questions
-
-Please don't hesitate to open an issue or pull request. You can also send me a message on Github
